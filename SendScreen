@@ -1,0 +1,43 @@
+package teste;
+
+import java.awt.*;
+import java.io.*;
+import java.net.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+
+
+public class Main {
+// http://www.guj.com.br/t/transferir-arquivos-via-socket/100935/6
+// http://www.guj.com.br/t/print-screen-em-java/68884
+
+	public static void main(String[] args) {
+		
+	  try{
+		ServerSocket servsock = new ServerSocket(5000);
+		Robot robot = new Robot();
+		
+	    while (true) {
+	    	Socket sock = servsock.accept();
+	    	System.out.println("Conexão aceita: " + sock);
+	      // 	envia o arquivo (transforma em byte array)
+	    	BufferedImage tela = robot.createScreenCapture(new Rectangle(0, 0, 1440, 900));
+	    	File myFile = new File ("D://telateste.jpg");
+	    	ImageIO.write(tela, "jpg", myFile);// Salva a imagem
+	    	
+	    	FileInputStream fis = new FileInputStream(myFile);
+	    	BufferedInputStream bis = new BufferedInputStream(fis);
+	    	byte [] mybytearray  = new byte [(int)myFile.length()];
+	    	bis.read(mybytearray,0,mybytearray.length);
+	    	OutputStream os = sock.getOutputStream();
+	    	System.out.println("Enviando...");
+	    	os.write(mybytearray,0,mybytearray.length);
+	    	os.flush();
+	    	sock.close();
+	      }
+	  } catch (Exception e){
+		  System.err.println(e);
+	  }
+	}
+	
+}
